@@ -232,7 +232,7 @@ dotnet run
 
 ## Node.js JavaScript Trigger Functions, Orchestrators and Activity Functions
 
-Check out the Patient Orchestra Javascript Function Project
+Check out the Patient Orchestra Javascript Function Project. Make sure your JavaScript functions are pointing correctly to the Python functions using the correct app names. Also ensure that you are using the correct storage accounts and event hub connection strings.
 
 ```shell
 git clone git@github.com:izzymsft/PatientOrchestra.git
