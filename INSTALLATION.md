@@ -3,8 +3,11 @@
 This tutorial assumes you have already installed Python 3.6.8 (or a later version in the 3.6.x series), Node.js 10.15.3 or later and .NET CORE SDK 2.2
 
 You can get these dependencies here:
+
 https://www.python.org/downloads/release/python-368/
+
 https://nodejs.org/en/download/
+
 https://dotnet.microsoft.com/download
 
 ```shell
