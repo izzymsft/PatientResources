@@ -1,0 +1,36 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "name": {
+            "value": "patientanalysisjob02"
+        },
+        "location": {
+            "value": "westus"
+        },
+        "apiVersion": {
+            "value": "2017-04-01-preview"
+        },
+        "sku": {
+            "value": "standard"
+        },
+        "streamingUnits": {
+            "value": 6
+        },
+        "jobType": {
+            "value": "Cloud"
+        },
+		"sharedAccessPolicyKey": {
+            "value": "abcde47jYTu9yeTe3zmSbDYLTHCWLa9HsFK/Za0mkJyhs="
+        },
+		"serviceBusNamespace": {
+            "value": "patientevents03"
+        },
+		"transformationQuery" : {
+			"value" : "SELECT TRY_CAST(T1.VitalTimestamp AS datetime) AS CaptureTime, TRIM(T1.PatientId) AS id, T1.Total as total, TRY_CAST(T2.MinTemperature AS bigint) AS min_temperature, TRY_CAST(T2.MaxTemperature AS bigint) AS max_temperature, T3.MinPulse AS min_pulse, T3.MaxPulse AS max_pulse, T3.MinDiastolic AS min_diastolic, T3.MaxDiastolic AS max_diastolic, T3.MinSystolic AS min_systolic, T3.MaxSystolic AS max_systolic INTO JobInfo FROM PatientTotals T1 TIMESTAMP BY VitalTimestamp JOIN PatientTemperature T2 TIMESTAMP BY VitalTimestamp ON T1.PatientId = T2.PatientId AND (DATEDIFF(second,T1, T2) between 0 AND 59) JOIN PatientPulseAndPressure T3 TIMESTAMP BY VitalTimestamp ON T2.PatientId = T3.PatientId AND (DATEDIFF(second, T2, T3) between 0 AND 59)"
+		},
+		"consumerGroupName" : {
+			"value": "stranalytics01"
+		}
+    }
+}

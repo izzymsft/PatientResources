@@ -1,0 +1,174 @@
+{
+    "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json",
+    "contentVersion": "1.2.2.0",
+    "parameters": {
+        "name": {
+            "type": "string"
+        },
+        "location": {
+            "type": "string"
+        },
+        "apiVersion": {
+            "type": "string"
+        },
+        "sku": {
+            "type": "string"
+        },
+        "jobType": {
+            "defaultValue": "Cloud",
+            "type": "string"
+        },
+        "streamingUnits": {
+            "defaultValue": 1,
+            "type": "int"
+        },
+		"sharedAccessPolicyKey" : {
+			"defaultValue" : "",
+			"type" : "string"
+		},
+		"serviceBusNamespace" : {
+			"defaultValue" : "",
+			"type" : "string"
+		},
+		"consumerGroupName" :  {
+			"defaultValue" : "",
+			"type" : "string"
+        },
+        "transformationQuery" : {
+            "defaultValue" : "",
+			"type" : "string"
+        }
+    },
+    "resources": [
+        {
+            "apiVersion": "[parameters('apiVersion')]",
+            "name": "[parameters('name')]",
+            "location": "[parameters('location')]",
+            "type": "Microsoft.StreamAnalytics/streamingjobs",
+            "properties": {
+                "sku": {
+                    "name": "[parameters('sku')]"
+                },
+                "outputErrorPolicy": "stop",
+                "eventsOutOfOrderPolicy": "adjust",
+                "eventsOutOfOrderMaxDelayInSeconds": 0,
+                "eventsLateArrivalMaxDelayInSeconds": 5,
+                "dataLocale": "en-US",
+                "jobType": "[parameters('jobType')]",
+				"compatibilityLevel" : "1.0",
+                "inputs": [
+					{
+						"name" : "PatientPulseAndPressure",
+						"type" : "Microsoft.StreamAnalytics/streamingjobs/inputs",
+						"apiVersion" : "[parameters('apiVersion')]",
+						"properties" : {
+							"type" : "Stream",
+							"serialization" : {
+								"type" : "Json", 
+								"properties" : {"encoding" : "UTF8", "format" : "LineSeparated"}
+							},
+							"dataSource" : {
+								"type" : "Microsoft.ServiceBus/EventHub",
+								"properties" : {
+									"serviceBusNamespace" : "[parameters('serviceBusNamespace')]",
+									"sharedAccessPolicyName" : "RootManageSharedAccessKey",
+									"sharedAccessPolicyKey" : "[parameters('sharedAccessPolicyKey')]",
+									"eventHubName" : "pulsebp",
+									"consumerGroupName" : "[parameters('consumerGroupName')]"
+								}
+							}
+						}
+					},
+					{
+						"name" : "PatientTemperature",
+						"type" : "Microsoft.StreamAnalytics/streamingjobs/inputs",
+						"apiVersion" : "[parameters('apiVersion')]",
+						"properties" : {
+							"type" : "Stream",
+							"serialization" : {
+								"type" : "Csv", 
+								"properties" : {"encoding" : "UTF8", "fieldDelimiter" : ","}
+							},
+							"dataSource" : {
+								"type" : "Microsoft.ServiceBus/EventHub",
+								"properties" : {
+									"serviceBusNamespace" : "[parameters('serviceBusNamespace')]",
+									"sharedAccessPolicyName" : "RootManageSharedAccessKey",
+									"sharedAccessPolicyKey" : "[parameters('sharedAccessPolicyKey')]",
+									"eventHubName" : "temperature",
+									"consumerGroupName" : "[parameters('consumerGroupName')]"
+								}
+							}
+						}
+					},
+					{
+						"name" : "PatientTotals",
+						"type" : "Microsoft.StreamAnalytics/streamingjobs/inputs",
+						"apiVersion" : "[parameters('apiVersion')]",
+						"properties" : {
+							"type" : "Stream",
+							"serialization" : {
+								"type" : "Json", 
+								"properties" : {"encoding" : "UTF8", "format" : "LineSeparated"}
+							},
+							"datasource" : {
+								"type" : "Microsoft.ServiceBus/EventHub",
+								"properties" : {
+									"serviceBusNamespace" : "[parameters('serviceBusNamespace')]",
+									"sharedAccessPolicyName" : "RootManageSharedAccessKey",
+									"sharedAccessPolicyKey" : "[parameters('sharedAccessPolicyKey')]",
+									"eventHubName" : "totals",
+									"consumerGroupName" : "[parameters('consumerGroupName')]"
+								}
+							}
+						}
+					}
+				],
+                "transformation": {
+                    "name": "Transformation",
+					"type": "Microsoft.StreamAnalytics/streamingjobs/transformations",
+                    "properties": {
+                        "query": "[parameters('transformationQuery')]",
+                        "streamingUnits": "[parameters('streamingUnits')]"
+                    }
+                },
+				"outputs" : [{
+					"name" : "JobInfo",
+					"type" : "Microsoft.StreamAnalytics/streamingjobs/outputs",
+					"apiVersion" : "[parameters('apiVersion')]",
+					"properties" : {
+						"type" : "Stream",
+						"serialization" : {
+							"type" : "Json", 
+							"properties" : {"encoding" : "UTF8", "format" : "LineSeparated"}
+						},
+						"dataSource" : {
+							"type" : "Microsoft.ServiceBus/EventHub",
+							"properties" : {
+								"serviceBusNamespace" : "[parameters('serviceBusNamespace')]",
+								"sharedAccessPolicyName" : "RootManageSharedAccessKey",
+								"sharedAccessPolicyKey" : "[parameters('sharedAccessPolicyKey')]",
+								"eventHubName" : "jobinfo",
+								"consumerGroupName" : "[parameters('consumerGroupName')]",
+								"partitionKey": "id",
+								"propertyColumns": [
+								"id",
+								"total",
+								"min_temperature",
+								"max_temperature",
+								"min_pulse",
+								"max_pulse",
+								"min_diastolic",
+								"max_diastolic",
+								"min_systolic",
+								"max_systolic"
+								  ]
+							}
+						}
+					}
+				
+				}]
+            }
+        }
+    ]
+}
