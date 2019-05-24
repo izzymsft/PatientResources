@@ -1,7 +1,7 @@
 ## Background Story
-This tutorial demonstrates how to use Durable functions written in JavaScript (Node.js) in collaboration with Azure Functions written in Python to process data with Event Hubs and Stream Analytics.
+This tutorial demonstrates how to use Durable functions written in JavaScript (Node.js) in collaboration with Azure Functions written in Python to process data with Azure Event Hubs and Azure Stream Analytics.
 
-Data arrives into 3 EventHubs and we use a Stream Analytics job to query the different data sources to extract the fields we need and drop the consolidate record into a new EventHub. As events are arriving at this destination EventHub, it is triggering a JavaScript function that then triggers a durable function (Node.js).
+Data arrives into 3 Event Hubs and we use a Stream Analytics job to query the different data sources to extract the fields we need and drop the consolidate record into a new EventHub. As events are arriving at this destination EventHub, it is triggering a JavaScript function that then triggers a durable function (Node.js).
 
 The Durable function picks up each event (record) from EventHub as it arrives and sends it over to an Activity Function (Node.js) that serves as a proxy and passes it to the corresponding Azure Function (Python). The output from this function is then passed back to the JavaScript Activity function that sends it into the Orchestrator.
 
@@ -31,7 +31,6 @@ https://dotnet.microsoft.com/download
 ```shell
 
 npm install -g azure-functions-core-tools
-
 npm install -g durable-functions
 
 pip install azure-functions
@@ -148,6 +147,7 @@ func azure functionapp publish patientcore01
 ## Dependency Setup - We need to set up dependencies for our Node.js Function project (Eventhubs and Stream Analytics)
 
 ### Step 1 - Create the Event Hub Namespace
+
 ```shell
 az eventhubs namespace create --resource-group patientsymphony --name patientevents03 --location westus --sku Standard --tags active=true csv=1 json=1 tsv=0 avro=0 
 ```
@@ -161,11 +161,13 @@ az eventhubs eventhub create --resource-group patientsymphony --namespace-name p
 ```
 
 ### Step 2b - Create the Output Event Hub where stream analytics will drop off the consolidated objects
+
 ```shell
 az eventhubs eventhub create --resource-group patientsymphony --namespace-name patientevents03 --name jobinfo
 ```
 
 ### Step 3 - Create Consumer Groups for all 4 Event Hubs. This is needed by the Stream Analytics clients reading from Event Hub
+
 ```shell  
 az eventhubs eventhub consumer-group create --resource-group patientsymphony --namespace-name patientevents03 --eventhub-name pulsebp --name stranalytics01
 
@@ -185,10 +187,12 @@ az eventhubs namespace authorization-rule keys list --name RootManageSharedAcces
 ```
 
 ### Step 5 - Set up the Stream Analytics Job
-The JSON Schema for this ARM Template is available here 
+
+The JSON Schema for this ARM Template is available here:
+
 https://raw.githubusercontent.com/Azure/azure-resource-manager-schemas/master/schemas/2016-03-01/Microsoft.StreamAnalytics.json
 
-Fetch the ARM templates for deploying the Stream Analytics Job via ARM Templates
+Fetch the ARM templates for deploying the Stream Analytics Job via ARM Templates and run the deployment to create the job
 
 ```shell
 
@@ -247,7 +251,6 @@ dotnet run
 
 ```
 
-
 ## Node.js JavaScript Trigger Functions, Orchestrators and Activity Functions
 
 Check out the Patient Orchestra Javascript Function Project. Make sure your JavaScript functions are pointing correctly to the Python functions using the correct app names. Also ensure that you are using the correct storage accounts and event hub connection strings.
@@ -278,12 +281,26 @@ az functionapp create --name patientorchestra01 --resource-group patientsymphony
 Let's run the code locally on port 9090 and debug it locally before publishing it to Azure
 
 ```shell
+# This starts the function on a port different from the default 7071
+
 func host start --port 9090
 ```
 
 ```shell
-
+# This uploads the local function code to Azure and makes it available from the Consumption plan
 func azure functionapp publish patientorchestra01
 
 ```
 
+You can continue to trigger more processing by running the data generator logic that writes new events into EventHubs:
+
+```shell
+# Grab the code
+git clone git@github.com:izzymsft/PatientStreamSource.git
+
+# Navigate to code root folder
+cd PatientStreamSource
+
+# Compile and run the code to generate the messages
+dotnet run
+```
