@@ -182,6 +182,9 @@ az group deployment create --name "patient-stream-job--deployment-001" --resourc
 
 ```
 
+Once the deployment is complete, please log into the portal and start the Stream Analytics job
+
+
 ## Run the following .NET Core Console App to Generate Some Events into Event Hubs
 
 The Console app here generates messages to event hub that will trigger the Javascript function
