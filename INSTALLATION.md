@@ -182,8 +182,9 @@ az group deployment create --name "patient-stream-job--deployment-001" --resourc
 
 ```
 
-Once the deployment is complete, please log into the portal and start the Stream Analytics job
+Once the deployment is complete, please log into the portal and start the Stream Analytics job, by clicking the "Start" button for the job.
 
+![alt text](StartStreamAnalyticsJob.png "Start Stream Analytics Job")
 
 ## Run the following .NET Core Console App to Generate Some Events into Event Hubs
 
