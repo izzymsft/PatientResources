@@ -1,3 +1,17 @@
+## Background Story
+This tutorial demonstrates how to use Durable functions written in JavaScript (Node.js) in collaboration with Azure Functions written in Python to process data with Event Hubs and Stream Analytics.
+
+Data arrives into 3 EventHubs and we use a Stream Analytics job to query the different data sources to extract the fields we need and drop the consolidate record into a new EventHub. As events are arriving at this destination EventHub, it is triggering a JavaScript function that then triggers a durable function (Node.js).
+
+The Durable function picks up this event (record) from EventHub and sends it over to an Activity Function (Node.js) that serves as a proxy and passes it to the corresponding Azure Function (Python). The output from this function is then passed back to the JavaScript Activity function that sends it into the Orchestrator.
+
+There are three more calls to activity functions that are also serving as proxies to the real Python functions doing the real work and their outputs are retrieved by the activity functions and passed back into the Orchestrator.
+
+The final output is collected in the orchestrator and sent to a Scoring function who has the option of writing the records to a datastore such as Cosmos DB or Azure SQL Database.
+
+There are CLI commands and ARM templates so simplify the provisioning of resources that are dependencies.
+
+There is also a helper utility program written in C# .NET 2.2 to help with generating the sample event hub messages.
 
 ## Installing Resources
 This tutorial assumes you have already installed Python 3.6.8 (or a later version in the 3.6.x series), Node.js 10.15.3 or later and .NET CORE SDK 2.2
