@@ -17,6 +17,8 @@ There is also a helper utility program written in C# .NET 2.2 to help with gener
 Data Generator --> Event Hubs --> Stream Analytics --> Event Hubs -> Trigger Function --> Orchestrator Function --> Activity Functions --> Orchestrator Function --> Scoring Service --> Data Stores 
 ```
 
+![alt text](PatientDataProcessing.png "Interactions with Data and Functions")
+
 ## Installing Resources
 This tutorial assumes you have already installed Python 3.6.8 (or a later version in the 3.6.x series), Node.js 10.15.3 or later and .NET CORE SDK 2.2
 
