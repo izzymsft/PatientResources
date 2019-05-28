@@ -182,13 +182,15 @@ az eventhubs eventhub consumer-group create --resource-group patientsymphony --n
 		
 ### Step 4 - Retrieve the Connection Details for the Event Hub Namespace. 
 
-This is needed for the .NET CORE Code that generates sample events into EventHubs
+This is needed for the .NET CORE Code that generates sample events into EventHubs as well as the connection to EventHub from Stream Analytics.
 
 ```shell
 az eventhubs namespace authorization-rule keys list --name RootManageSharedAccessKey --resource-group patientsymphony --namespace-name patientevents03 
 ```
 
 ### Step 5 - Set up the Stream Analytics Job
+
+You will need to sharedAccessPolicyKey from your EventHubs resources for the deployment parameters file
 
 The JSON Schema for this ARM Template is available here:
 
