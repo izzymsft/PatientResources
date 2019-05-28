@@ -248,6 +248,12 @@ git clone git@github.com:izzymsft/PatientStreamSource.git
 # Navigate to code root folder
 cd PatientStreamSource
 
+# Fetch all the dependencies if necessary
+dotnet restore
+
+# Check if the compilation works
+dotnet build
+
 # Compile and run the code to generate the messages
 dotnet run
 
